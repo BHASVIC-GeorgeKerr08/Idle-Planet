@@ -4,6 +4,7 @@ body {
     grid-template-rows: auto auto auto;
     gap: 10px;
     height: 908px;
+    
 }
 
 .effects {
@@ -242,7 +243,7 @@ body {
 
 
 .planet {
-    width: 200px;
+    width: 250px;
     height: 40px;
     padding: 0px;
     display: flex;
@@ -255,7 +256,7 @@ body {
 .planet-unlock {
     border: 2px solid black;
     border-radius: 10px;
-    width: 70px;
+    width: 100px;
     height:40px;
     align-items: center;
     justify-content: center;
@@ -349,7 +350,6 @@ body {
     align-items: center;    
     position: absolute;
 }
-
 
 
 
