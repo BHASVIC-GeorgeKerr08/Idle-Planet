@@ -5,6 +5,7 @@ body {
     gap: 10px;
     height: 100%;
     background: linear-gradient(to bottom, #220B36, #4F2B35);
+    color: white;
 }
 
 .effects {
@@ -41,6 +42,27 @@ body {
 .workers h2 {
     color: #3F0FFF;
 }
+
+.prestige button,
+.gamble-loss,
+.shop-item,
+.worker-button,
+.next-planet,
+.planet-unlock {
+    color: red;
+}
+
+.planet-row {
+    color: grey;
+}
+
+
+
+.gamble-win {
+    color: green;
+}
+
+
 
 
 
@@ -260,11 +282,9 @@ body {
 }
 
 
-
 .shop span {
     text-align: left;
 }
-
 
 
 .planet {
@@ -277,6 +297,7 @@ body {
     align-items: center;
     border-radius: 10px;
 }
+
 
 .planet-unlock {
     border: 2px solid black;
@@ -376,5 +397,53 @@ body {
     position: absolute;
 }
 
+
+
+
+.title,
+.level {
+    border-color: #3F9FFF;
+}
+
+.center {
+    border-color: #1D3169;
+}
+
+.achievements {
+    border-color: #7BCFFF;
+}
+
+.achievement {
+    border-color: white;
+}
+
+.left,
+.minigames,
+.prestige,
+.population-gambling {
+    border-color: #0b7bdd;
+}
+
+.workers {
+    border-color: #3F0FFF;
+}
+
+.effects {
+    border-color: #9205FF;
+}
+
+.effect {
+    border-color: white;
+}
+
+.effect-price {
+    border-color: white;
+}
+
+.right,
+.shop,
+.planets {
+    border-color: #9205FF;
+}
 
 
