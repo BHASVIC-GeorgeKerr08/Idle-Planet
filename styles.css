@@ -61,6 +61,21 @@ body {
     color: red;
 }
 
+.minigame-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.minigame-button,
+.prestige button,
+.gamble-button,
+.worker-button,
+.shop-item {
+    font-family: "Bungee";
+}
+
+
 .planet-row {
     color: grey;
 }
@@ -248,7 +263,7 @@ body {
 
 
 .population-gambling {
-    height: 170px;
+    height: 200px;
 }
 
 
@@ -420,6 +435,7 @@ body {
 
 .achievements {
     border-color: #7BCFFF;
+    
 }
 
 .achievement {
@@ -480,7 +496,6 @@ body {
 .multi-purchase-state {
     color: purple;
 }
-
 
 
 
