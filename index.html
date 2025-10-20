@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Idle Planet</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bungee&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="top-center">
@@ -51,7 +56,7 @@
             <h2>🎲Population Gambling</h2>
             <div class="gamble-input">
                 <input class="gamble-amount" type="text" placeholder="Enter amount"></input>
-                <button>Gamble</button>
+                <button class="gamble-button">Gamble</button>
             
             </div>
             <h4 style="margin: 5px; text-align: left;">Win return: </h4>
@@ -95,7 +100,7 @@
     </div>
     <div class="right">
            <div class="shop">
-                <div class="multi-purchase"><button><h3>x1</h3></button></div>
+                <div class="multi-purchase"><button><h3><span class="multi-purchase-state">x1</span></h3></button></div>
                 <h2>🛍️Shop</h2>
                 <div class="shop-list">
                     <div class="shop-row">
