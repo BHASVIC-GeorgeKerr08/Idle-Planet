@@ -6,7 +6,16 @@ body {
     height: 100%;
     background: linear-gradient(to bottom, #220B36, #4F2B35);
     color: white;
+    font-family: "Bungee", sans-serif;
 }
+
+
+.bungee-regular {
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 
 .effects {
     grid-row: 1;
@@ -445,5 +454,34 @@ body {
 .planets {
     border-color: #9205FF;
 }
+
+
+
+.minigame-button,
+.gamble-button,
+.worker-button,
+.effect,
+.shop-item,
+.planet {
+    background-color: #3D2A4F;
+}
+
+
+.minigame-button,
+.gamble-button {
+    color: white;
+}
+
+
+.multi-purchase {
+    border: 2px solid #F349CE;
+}
+
+.multi-purchase-state {
+    color: purple;
+}
+
+
+
 
 
