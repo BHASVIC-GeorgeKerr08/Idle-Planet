@@ -152,6 +152,10 @@ body {
     margin: 10px;
     text-align: center;
     height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
 }
 
 .top-center {
@@ -193,6 +197,9 @@ body {
     height: 40px;
     width: 500px;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
 }
 
@@ -481,6 +488,7 @@ body {
 .planet {
     background-color: #3D2A4F;
 }
+
 
 
 .minigame-button,
