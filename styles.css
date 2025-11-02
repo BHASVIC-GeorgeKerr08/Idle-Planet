@@ -232,7 +232,7 @@ body {
 }
 
 .workers {
-    height: auto;
+    height: 150px;
     width: 600px;
     display: flex;
     text-align: center;
@@ -247,7 +247,7 @@ body {
 
 .worker-button {
     width: 150px;
-    height: auto;
+    height: 30px;
 }
 
 
@@ -505,11 +505,6 @@ body {
     color: purple;
 }
 
-.center {
-    height: auto;
-}
 
-.workers {
-    padding: 0px;
-}
 
+ 
