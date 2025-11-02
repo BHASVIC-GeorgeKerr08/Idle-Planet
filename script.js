@@ -1,9 +1,10 @@
 // ========== GAME DATA ========== //
 
+
 const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 300,
+    money: 0,
     money_per_second: 0, 
 
     // WORKERS
@@ -12,8 +13,14 @@ const game_data = {
     worker_increase:  1, // The amount of population that each worker increases every action
     total_worker_gen: 0, // The amount of population that all workers combined are generating per second
     worker_price: 100,
-    worker_price_multiplier: 0.1 
+    worker_price_multiplier: 0.1,
+
+    // SHOP
+    
 }
+
+
+
 
 // ========== FUNCTIONS ========== //
 
@@ -29,6 +36,7 @@ document.getElementById("planet-button").addEventListener("click", function (eve
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places                                
     document.getElementById("population").textContent = game_data.population 
     document.getElementById("money-per-second").textContent = game_data.money_per_second
+
 })
 
 
@@ -64,7 +72,7 @@ setInterval(() => {
 setInterval(() => {
     game_data.population += game_data.total_worker_gen
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
-
+    console.log(game_data.money_per_second)
     game_data.money_per_second = game_data.population * 0.01   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
 
