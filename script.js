@@ -1,10 +1,11 @@
+
 // ========== GAME DATA ========== //
 
 
 const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 0,
+    money: 10000,
     money_per_second: 0, 
 
     // WORKERS
@@ -16,14 +17,26 @@ const game_data = {
     worker_price_multiplier: 0.1,
 
     // SHOP
-    multi_purchase_state: 0,
+    multi_purchase_state: 1,
 
     upgrades: {
         click_surge: {
-            price: 100
+            price: 100,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.01,
+            base_price: 100,
+            max_purchase: 0,
         },
         income_boost: {
-            price: 1000
+            price: 1000,
+      
+            level: 1,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.03,
+            base_price: 1000,
+            max_purchase: 0,
+     
         }
     }
 }
@@ -92,18 +105,65 @@ setInterval(() => {
 
 
 document.getElementById("multi-purchase-button").addEventListener("click", function (event) {
-    switch(game_data.multi_purchase_state) {
-        case 1: game_data.multi_purchase_state = 10
-        case 10: game_data.multi_purchase_state = 25
-        case 25: game_data.multi_purchase_state = 0
-        default: game_data.multi_purchase_state = 1
 
-    update_prices()
+    switch(game_data.multi_purchase_state) {
+        case 1: game_data.multi_purchase_state = 10; break
+        case 10: game_data.multi_purchase_state = 25; break
+        case 25: game_data.multi_purchase_state = 0; break
+        default: game_data.multi_purchase_state = 1
     }
+    update_prices()
+    console.log(game_data.upgrades.click_surge.price)
+    console.log(game_data.upgrades.income_boost.price)
+    if (game_data.multi_purchase_state == 0) {
+         document.getElementById("multi-purchase-state").textContent = "MAX"
+         document.getElementById("purchase-amount").textContent = game_data.upgrades.click_surge.max_purchase
+    }
+    else {
+    document.getElementById("multi-purchase-state").textContent = `x${game_data.multi_purchase_state}`
+    document.getElementById("purchase-amount").textContent = game_data.multi_purchase_state
+    }
+  
+    
 })
 
+
 function update_prices() {
-    for (const [key, value] of Object.entries(game_data.upgrades)) {
-        console.log(key, value)
+    for (const key in game_data.upgrades) {
+        let current_upgrade = game_data.upgrades[key]
+        current_upgrade.price = current_upgrade.base_price
+        current_upgrade.price_multiplier = 0.1
+        if (game_data.multi_purchase_state == 0) {
+            let prices = []
+            prices.push(current_upgrade.price)
+            var count = 1
+            let next_price = 0 
+            while (true) {
+                next_price = prices[count-1] * (1 + current_upgrade.price_multiplier)
+                next_price = Math.round(next_price * 100)/100 
+                var prices_sum = 0 
+                for (let i = 0; i < prices.length; i++) {
+                    prices_sum += prices[i]
+                }
+ 
+                if ((prices_sum + next_price) > game_data.money) {
+                    break
+                }
+
+                current_upgrade.price_multiplier += current_upgrade.multiplier_increase
+                count ++
+                prices.push(next_price)
+               
+            }
+            current_upgrade.price = prices_sum
+            current_upgrade.max_purchase = count
+
+        } else {
+            for (let i = 0; i<game_data.multi_purchase_state-1; i++) {
+                current_upgrade.price *= 1 + current_upgrade.price_multiplier
+                current_upgrade.price_multiplier += current_upgrade.multiplier_increase
+            }
+        }
+        current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
     }
 }
