@@ -16,7 +16,16 @@ const game_data = {
     worker_price_multiplier: 0.1,
 
     // SHOP
-    
+    multi_purchase_state: 0,
+
+    upgrades: {
+        click_surge: {
+            price: 100
+        },
+        income_boost: {
+            price: 1000
+        }
+    }
 }
 
 
@@ -72,7 +81,6 @@ setInterval(() => {
 setInterval(() => {
     game_data.population += game_data.total_worker_gen
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
-    console.log(game_data.money_per_second)
     game_data.money_per_second = game_data.population * 0.01   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
 
@@ -80,3 +88,22 @@ setInterval(() => {
     document.getElementById("money-per-second").textContent = game_data.money_per_second
     
 }, game_data.worker_speed * 1000)
+
+
+
+document.getElementById("multi-purchase-button").addEventListener("click", function (event) {
+    switch(game_data.multi_purchase_state) {
+        case 1: game_data.multi_purchase_state = 10
+        case 10: game_data.multi_purchase_state = 25
+        case 25: game_data.multi_purchase_state = 0
+        default: game_data.multi_purchase_state = 1
+
+    update_prices()
+    }
+})
+
+function update_prices() {
+    for (const [key, value] of Object.entries(game_data.upgrades)) {
+        console.log(key, value)
+    }
+}
