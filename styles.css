@@ -499,6 +499,13 @@ body {
 
 .multi-purchase {
     border: 2px solid #F349CE;
+    text-align: left;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    padding: 0;
+    height: 35px;
+    width: auto;
 }
 
 .multi-purchase-state {
