@@ -100,14 +100,14 @@
     </div>
     <div class="right">
            <div class="shop">
-                <div class="multi-purchase"><button id="multi-purchase-button"><h3><span class="multi-purchase-state">x1</span></h3></button></div>
+                <div class="multi-purchase"><button id="multi-purchase-button"><h3><span class="multi-purchase-state" id="multi-purchase-state">x1</span></h3></button></div>
                 <h2>🛍️Shop</h2>
                 <div class="shop-list">
                     <div class="shop-row">
-                        <button class="shop-item">Upgrade 1:<span>x1</span></button>
+                        <button class="shop-item">Upgrade 1:<span id="purchase-amount">x1</span></button>
                         <span>Price</span>
                     </div>
-                    <span>x0</span>
+                    <span id="upgrade-level">x0</span>
                     <div style="height: 10px"></div>
                     <div class="shop-row">
                         <button class="shop-item">Upgrade 2:<span>x1</span></button>
@@ -157,4 +157,3 @@
 </body>
 <script src="script.js"></script>
 </html>
-
