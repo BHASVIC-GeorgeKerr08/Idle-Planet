@@ -5,7 +5,7 @@
 const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 10000,
+    money: 0,
     money_per_second: 0, 
 
     // WORKERS
@@ -104,6 +104,7 @@ setInterval(() => {
 
 
 
+
 document.getElementById("multi-purchase-button").addEventListener("click", function (event) {
 
     switch(game_data.multi_purchase_state) {
@@ -167,3 +168,6 @@ function update_prices() {
         current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
     }
 }
+
+
+
