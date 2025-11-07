@@ -19,6 +19,16 @@ const game_data = {
     // SHOP
     multi_purchase_state: 1,
 
+    upgrade_elements : [
+        'click-surge', 'income-boost', 'industry-boom',
+        'worker-training', 'worker-tools', 'worker-efficiency',
+        'population-multiplier-boost', 'quicker-prestige', 'permanent-click-boost',
+        'double-minigame-reward', 'temporary-population-surge', 
+        'gamble-luck','win-streak',
+        'achievement-gem-boost', 'achievement-xp-boost',
+        'max-offline-earnings', 'max-offline-earning-time'
+    ],
+
     upgrades: {
         click_surge: {
             price: 100,
@@ -29,17 +39,137 @@ const game_data = {
             max_purchase: 0,
         },
         income_boost: {
+            price: 500,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.02,
+            base_price: 500,
+            max_purchase: 0,
+        },
+        industry_boom: {
+            price: 10000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.05,
+            base_price: 10000,
+            max_purchase: 0,
+        },
+        worker_training: {
             price: 1000,
-      
-            level: 1,
+            level: 0,
             price_multiplier: 0.1,
             multiplier_increase: 0.03,
             base_price: 1000,
             max_purchase: 0,
-     
+        },
+        worker_tools: {
+            price: 5000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.05,
+            base_price: 5000,
+            max_purchase: 0,
+        },
+        worker_efficiency: {
+            price: 7500,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.08,
+            base_price: 7500,
+            max_purchase: 0,
+        },
+        population_multiplier_boost: {
+            price: 10000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.08,
+            base_price: 10000,
+            max_purchase: 0,
+        },
+        quicker_prestige: {
+            price: 5000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.07,
+            base_price: 5000,
+            max_purchase: 0,
+        },
+        permanent_click_boost: {
+            price: 20000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.08,
+            base_price: 20000,
+            max_purchase: 0,
+        },
+        double_minigame_reward: {
+            price: 30000,
+            level: 1,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.125,
+            base_price: 30000,
+            max_purchase: 0,
+        },
+        temporary_population_surge: {
+            price: 20000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.125,
+            base_price: 20000,
+            max_purchase: 0,
+        },
+        gamble_luck: {
+            price: 50000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.125,
+            base_price: 1000,
+            max_purchase: 0,
+        },
+        win_streak: {
+            price: 5000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.07,
+            base_price: 5000,
+            max_purchase: 0,
+        },
+        achievement_gem_boost: {
+            price: 2000,
+            level: 1,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.03,
+            base_price: 2000,
+            max_purchase: 0,
+        },
+        achievement_xp_boost: {
+            price: 5000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.05,
+            base_price: 5000,
+            max_purchase: 0,
+        },
+        max_offline_earnings: {
+            price: 30000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.09,
+            base_price: 30000,
+            max_purchase: 0,
+        },
+        max_offline_earning_time: {
+            price: 50000,
+            level: 0,
+            price_multiplier: 0.1,
+            multiplier_increase: 0.12,
+            base_price: 50000,
+            max_purchase: 0,
         }
     }
 }
+
+
 
 
 
@@ -105,6 +235,9 @@ setInterval(() => {
 
 
 
+
+
+
 document.getElementById("multi-purchase-button").addEventListener("click", function (event) {
 
     switch(game_data.multi_purchase_state) {
@@ -114,8 +247,6 @@ document.getElementById("multi-purchase-button").addEventListener("click", funct
         default: game_data.multi_purchase_state = 1
     }
     update_prices()
-    console.log(game_data.upgrades.click_surge.price)
-    console.log(game_data.upgrades.income_boost.price)
     if (game_data.multi_purchase_state == 0) {
          document.getElementById("multi-purchase-state").textContent = "MAX"
          document.getElementById("purchase-amount").textContent = game_data.upgrades.click_surge.max_purchase
@@ -129,6 +260,8 @@ document.getElementById("multi-purchase-button").addEventListener("click", funct
 })
 
 
+
+console.log(new_string)
 function update_prices() {
     for (const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
@@ -169,5 +302,14 @@ function update_prices() {
     }
 }
 
+
+const div = document.querySelector(".shop-list")
+const elements = div.querySelectorAll(".shop-item")
+var upgrade_elements = []
+elements.forEach(element => {
+    upgrade_elements.push(element.id)
+});
+
+console.log(upgrade_elements)
 
 
