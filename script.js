@@ -5,7 +5,7 @@
 const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 0,
+    money: 1000000000,
     money_per_second: 0, 
 
     // WORKERS
@@ -221,6 +221,21 @@ setInterval(() => {
 }, 1000)
 
 
+//elements.forEach(element => {
+    //upgrade_names.push(element.id.replace(/-/g, "_"))
+//})
+
+    
+
+//setInterval(() => {
+   // for(let i = 0; i<game_data.upgrade_elements.length; i++) {
+   //     document.getElementById(game_data.upgrade_elements[i]).textContent = game_data.upgrades[upgrade_names[i]].price
+  //  }
+//}, 2500)
+
+
+
+
 setInterval(() => {
     game_data.population += game_data.total_worker_gen
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
@@ -229,10 +244,57 @@ setInterval(() => {
 
     document.getElementById("population").textContent = game_data.population
     document.getElementById("money-per-second").textContent = game_data.money_per_second
-    
+
 }, game_data.worker_speed * 1000)
 
 
+for(let i = 0; i < game_data.upgrade_elements.length; i++) {
+
+    
+    document.getElementById(game_data.upgrade_elements[i]).addEventListener("click", function (event) {
+        upgrade(game_data.upgrade_elements[i])
+    })
+}
+     
+
+
+function upgrade(upgrade_element) {
+    let upgrade_name = upgrade_element.replaceAll("-", "_")
+
+    if(game_data.money > game_data.upgrades[upgrade_name].price) {
+        if(game_data.multi_purchase_state == 0) {
+    
+            game_data.upgrades[upgrade_name].level += game_data.upgrades[upgrade_name].max_purchase
+      
+    } else {
+          
+            game_data.upgrades[upgrade_name].level += game_data.multi_purchase_state
+        }
+
+    console.log(increase)
+
+    switch(upgrade_name) {
+        case "industry_boom": game_data.money_per_second *= 1.2; 
+            document.getElementById("money-per-second").textContent = game_data.money_per_second
+            break
+        case "worker_efficiency":
+
+                game_data.worker_speed -= 0.1; 
+                game_data.total_worker_gen = (game_data.workers * game_data.worker_increase)  
+                document.getElementById("worker-gen").textContent = game_data.total_worker_gen / game_data.worker_speed
+      
+            
+            break
+        case "worker_tools":
+             console.log(1 - ((1 / 10) * game_data.upgrades.worker_tools.level)); 
+             game_data.worker_price *= (1 - ((1 / 10) * game_data.upgrades.worker_tools.level)); document.getElementById("worker-price").textContent = game_data.worker_price
+        }
+
+    }
+
+    game_data.money -= game_data.upgrades[upgrade_name].price
+    document.getElementById("money").textContent = game_data.money
+}
 
 
 
@@ -247,22 +309,15 @@ document.getElementById("multi-purchase-button").addEventListener("click", funct
         default: game_data.multi_purchase_state = 1
     }
     update_prices()
-    if (game_data.multi_purchase_state == 0) {
-         document.getElementById("multi-purchase-state").textContent = "MAX"
-         document.getElementById("purchase-amount").textContent = game_data.upgrades.click_surge.max_purchase
-    }
-    else {
-    document.getElementById("multi-purchase-state").textContent = `x${game_data.multi_purchase_state}`
-    document.getElementById("purchase-amount").textContent = game_data.multi_purchase_state
-    }
+
   
     
 })
 
 
 
-console.log(new_string)
 function update_prices() {
+    let upgrade_number = 0
     for (const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
         current_upgrade.price = current_upgrade.base_price
@@ -291,25 +346,25 @@ function update_prices() {
             }
             current_upgrade.price = prices_sum
             current_upgrade.max_purchase = count
-
+           
+            
+            document.getElementById("multi-purchase-state").textContent = "MAX"
+            document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${game_data.upgrades[key].max_purchase}`
+            upgrade_number ++
+           
         } else {
+   
             for (let i = 0; i<game_data.multi_purchase_state-1; i++) {
                 current_upgrade.price *= 1 + current_upgrade.price_multiplier
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
             }
+            document.getElementById("multi-purchase-state").textContent = `x${game_data.multi_purchase_state}`
+            document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${game_data.multi_purchase_state}`
+            upgrade_number ++
         }
         current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
     }
 }
 
-
-const div = document.querySelector(".shop-list")
-const elements = div.querySelectorAll(".shop-item")
-var upgrade_elements = []
-elements.forEach(element => {
-    upgrade_elements.push(element.id)
-});
-
-console.log(upgrade_elements)
 
 
