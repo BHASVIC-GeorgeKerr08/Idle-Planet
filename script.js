@@ -2,10 +2,10 @@
 // ========== GAME DATA ========== //
 
 
-const game_data = {
+var game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 10000000000,
+    money: 0,
     money_per_second: 0, 
 
     // WORKERS
@@ -201,7 +201,6 @@ setInterval(() => {
     game_data.money += game_data.money_per_second
     game_data.money = Math.round(game_data.money * 100) / 100 //Removes extra, unwanted decimal places 
     document.getElementById("money").textContent = game_data.money
-    console.log(game_data.worker_speed)
 }, 1000)
 
 
@@ -374,6 +373,19 @@ function update_prices() {
         update_price_and_level()
 
     }
+}
+
+function save_data() {
+    localStorage.setItem("game_data", JSON.stringify(game_data))
+}
+
+
+setInterval(() => {
+    save_data()
+}, 1000)
+
+window.onload = function() {
+    Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
 }
 
 
