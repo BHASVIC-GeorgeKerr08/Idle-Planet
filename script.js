@@ -377,15 +377,20 @@ function update_prices() {
 
 function save_data() {
     localStorage.setItem("game_data", JSON.stringify(game_data))
+      
 }
 
 
 setInterval(() => {
     save_data()
-}, 1000)
+}, 5000)
+
+document.getElementById("save-button").addEventListener("click", function (event) {
+    save_data()
+    console.log("Save Button Clicked")
+})
 
 window.onload = function() {
-    Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
+    game_data =  (JSON.parse(localStorage.getItem("game_data")))
 }
-
 
