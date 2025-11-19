@@ -2,10 +2,10 @@
 // ========== GAME DATA ========== //
 
 
-var game_data = {
+const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 0,
+    money: 5000,
     money_per_second: 0, 
 
     // WORKERS
@@ -146,9 +146,6 @@ var game_data = {
 
   
 }
-
-
-
 
 
 // ========== FUNCTIONS ========== //
@@ -345,6 +342,12 @@ function update_prices() {
                 if(prices_sum + next_price > game_data.money) {
                     break
                 }
+                
+                if(upgrade_number == 0) {
+                    console.log(next_price)
+                }
+
+                    
 
                 prices.push(next_price)
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
@@ -363,6 +366,7 @@ function update_prices() {
             for (let i = 0; i<game_data.multi_purchase_state-1; i++) {
                 current_upgrade.price *= 1 + current_upgrade.price_multiplier
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
+                
             }
  
             document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${game_data.multi_purchase_state}`
@@ -377,20 +381,18 @@ function update_prices() {
 
 function save_data() {
     localStorage.setItem("game_data", JSON.stringify(game_data))
-      
 }
-
 
 setInterval(() => {
     save_data()
 }, 5000)
 
+
 document.getElementById("save-button").addEventListener("click", function (event) {
     save_data()
-    console.log("Save Button Clicked")
 })
 
 window.onload = function() {
-    game_data =  (JSON.parse(localStorage.getItem("game_data")))
+    Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
 }
 
