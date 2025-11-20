@@ -34,6 +34,7 @@ const game_data = {
             price: 100,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.01,
             base_price: 100,
             max_purchase: 0,
@@ -42,6 +43,7 @@ const game_data = {
             price: 500,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.02,
             base_price: 500,
             max_purchase: 0,
@@ -50,6 +52,7 @@ const game_data = {
             price: 10000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.05,
             base_price: 10000,
             max_purchase: 0,
@@ -58,6 +61,7 @@ const game_data = {
             price: 1000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.03,
             base_price: 1000,
             max_purchase: 0,
@@ -66,6 +70,7 @@ const game_data = {
             price: 7500,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.08,
             base_price: 7500,
             max_purchase: 0,
@@ -74,6 +79,7 @@ const game_data = {
             price: 10000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.08,
             base_price: 10000,
             max_purchase: 0,
@@ -82,6 +88,7 @@ const game_data = {
             price: 5000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.07,
             base_price: 5000,
             max_purchase: 0,
@@ -90,6 +97,7 @@ const game_data = {
             price: 20000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.08,
             base_price: 20000,
             max_purchase: 0,
@@ -98,6 +106,7 @@ const game_data = {
             price: 30000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.125,
             base_price: 30000,
             max_purchase: 0,
@@ -106,6 +115,7 @@ const game_data = {
             price: 20000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.125,
             base_price: 20000,
             max_purchase: 0,
@@ -114,6 +124,7 @@ const game_data = {
             price: 50000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.125,
             base_price: 1000,
             max_purchase: 0,
@@ -122,6 +133,7 @@ const game_data = {
             price: 5000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.07,
             base_price: 5000,
             max_purchase: 0,
@@ -130,6 +142,7 @@ const game_data = {
             price: 2000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.03,
             base_price: 2000,
             max_purchase: 0,
@@ -138,6 +151,7 @@ const game_data = {
             price: 5000,
             level: 0,
             price_multiplier: 0.1,
+            base_multiplier: 0.1,
             multiplier_increase: 0.05,
             base_price: 5000,
             max_purchase: 0,
@@ -269,6 +283,7 @@ function upgrade(upgrade_element) {
 
        
         game_data.upgrades[upgrade_name].base_price = game_data.upgrades[upgrade_name].price
+        game_data.upgrades[upgrade_name].base_multiplier = game_data.upgrades[upgrade_name].price_multiplier
         update_prices()
         
     }
@@ -299,6 +314,12 @@ setInterval(() => {
             document.getElementById(game_data.upgrade_elements[i]).style.color = "red"
         }
     }
+
+    if(game_data.money >= game_data.worker_price) {
+        document.getElementById("worker-button").style.color = "green"
+    } else {
+        document.getElementById("worker-button").style.color = "red"
+    }
 }, 1000)
 
 
@@ -328,48 +349,47 @@ function update_prices() {
     for(const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
         current_upgrade.price = current_upgrade.base_price
+        current_upgrade.price_multiplier = current_upgrade.base_multiplier
         var prices = []
         prices.push(current_upgrade.price)
         var count = 1
         var next_price = 0
         var prices_sum = 0
         if(game_data.multi_purchase_state == 0) {
-            current_upgrade.price_multiplier = 0.1
-            
+    
             while(true) {
                 next_price = prices[count -1] * (1 + current_upgrade.price_multiplier)
-                var prices_sum = 0
+              
+                prices_sum = 0
                 for(let i = 0; i<prices.length; i++) {
                     prices_sum += prices[i]
                 }
 
-                if(prices_sum + next_price > game_data.money) {
+                if(prices_sum + next_price > game_data.money) {  
                     break
                 }
-                
-                
-
-                    
 
                 prices.push(next_price)
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
                 count ++
+
+             
                 
             }
 
-
+          
             current_upgrade.price = prices_sum
             current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
             current_upgrade.max_purchase = count 
-            
+
             document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${current_upgrade.max_purchase}`
             upgrade_number ++
 
-        } else if(game_data.multi_purchase_state == 1) {
-            current_upgrade.price = current_upgrade.base_price
-        } 
-        else {
-            current_upgrade.price_multiplier = 0.1
+ 
+       
+
+        } else {
+
             for (let i = 0; i<game_data.multi_purchase_state-1; i++) {
                 next_price = prices[count -1] * (1 + current_upgrade.price_multiplier)
                 prices.push(next_price)
@@ -378,10 +398,11 @@ function update_prices() {
                 
             }
 
+            prices_sum =  0
             for(let i = 0; i<prices.length; i++) {
                 prices_sum += prices[i]
             }
-            console.log(prices)
+         
 
             current_upgrade.price = prices_sum
             
@@ -391,24 +412,35 @@ function update_prices() {
 
         current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
         update_price_and_level()
-
     }
 }
 
+     
 function save_data() {
     localStorage.setItem("game_data", JSON.stringify(game_data))
 }
 
 setInterval(() => {
-    //save_data()
+    save_data()
 }, 5000)
 
 
 document.getElementById("save-button").addEventListener("click", function (event) {
-    //save_data()
+    save_data()
 })
 
 window.onload = function() {
     Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
+    update_prices()
+    update_price_and_level()
+    
+    
+    document.getElementById("population").textContent = game_data.population 
+    document.getElementById("money").textContent = game_data.money
+    document.getElementById("money-per-second").textContent = game_data.money_per_second
+    document.getElementById("workers").textContent = game_data.workers
+    document.getElementById("worker-price").textContent = game_data.worker_price
+    document.getElementById("worker-gen").textContent = Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100
+
 }
 
