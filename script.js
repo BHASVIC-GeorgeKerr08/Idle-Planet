@@ -4,8 +4,8 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 0,
-    money: 5000,
+    population: 99,
+    money: 500,
     money_per_second: 0, 
 
     // WORKERS
@@ -158,9 +158,15 @@ const game_data = {
         },
     },
 
+    // PRESTIGE
+
+    prestige_level: 0,
+    prestige_cost: 1000000,
+    prestige_multiplier: 1.0,
   
 }
 
+const default_game_data = JSON.parse(JSON.stringify(game_data))
 
 // ========== FUNCTIONS ========== //
 
@@ -179,7 +185,7 @@ document.getElementById("planet-button").addEventListener("click", function (eve
         game_data.money_per_second *= 1.2
         game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100
     }                         
-    document.getElementById("population").textContent = game_data.population 
+    document.getElementById("population").textContent = formatNum(game_data.population)
     document.getElementById("money-per-second").textContent = game_data.money_per_second
 
 })
@@ -197,9 +203,9 @@ document.getElementById("worker-button").addEventListener("click", function (eve
         game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
         game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100
       
-        document.getElementById("workers").textContent = game_data.workers
-        document.getElementById("worker-price").textContent = game_data.worker_price
-        document.getElementById("worker-gen").textContent = Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100
+        document.getElementById("workers").textContent = formatNum(game_data.workers)
+        document.getElementById("worker-price").textContent = formatNum(game_data.worker_price)
+        document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
 
     }
  
@@ -211,7 +217,7 @@ document.getElementById("worker-button").addEventListener("click", function (eve
 setInterval(() => {
     game_data.money += game_data.money_per_second
     game_data.money = Math.round(game_data.money * 100) / 100 //Removes extra, unwanted decimal places 
-    document.getElementById("money").textContent = game_data.money
+    document.getElementById("money").textContent = formatNum(game_data.money)
 }, 1000)
 
 
@@ -223,7 +229,7 @@ function worker_click() {
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
     game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
-    document.getElementById("population").textContent = game_data.population
+    document.getElementById("population").textContent = formatNum(game_data.population)
     document.getElementById("money-per-second").textContent = game_data.money_per_second
     interval = setInterval(worker_click, game_data.worker_speed * 1000)
 }
@@ -266,7 +272,7 @@ function upgrade(upgrade_element) {
                 game_data.worker_increase *= (1 + (game_data.upgrades.worker_training.level * 20) / 100)
                 game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
                 game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100
-                document.getElementById("worker-gen").textContent = Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100
+                document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
             }
         }
 
@@ -276,7 +282,7 @@ function upgrade(upgrade_element) {
 
 
         game_data.money -= game_data.upgrades[upgrade_name].price
-        document.getElementById("money").textContent = game_data.money
+        document.getElementById("money").textContent = formatNum(game_data.money)
         game_data.upgrades[upgrade_name].price *= 1 + game_data.upgrades[upgrade_name].price_multiplier
         game_data.upgrades[upgrade_name].price_multiplier += game_data.upgrades[upgrade_name].multiplier_increase 
         game_data.upgrades[upgrade_name].price = Math.round(game_data.upgrades[upgrade_name].price * 100) / 100 //Removes extra, unwanted decimal places 
@@ -294,7 +300,7 @@ function update_price_and_level() {
     for(let i = 0; i<game_data.upgrade_elements.length; i++) {
         let upgrade_name = game_data.upgrade_elements[i].replaceAll("-", "_") 
         document.getElementById(`${game_data.upgrade_elements[i]}-level`).textContent = game_data.upgrades[upgrade_name].level  
-        document.getElementById(`${game_data.upgrade_elements[i]}-price`).textContent = game_data.upgrades[upgrade_name].price
+        document.getElementById(`${game_data.upgrade_elements[i]}-price`).textContent = formatNum(game_data.upgrades[upgrade_name].price)
     }
 }
 
@@ -422,7 +428,7 @@ function save_data() {
 
 setInterval(() => {
     save_data()
-}, 5000)
+}, 500)
 
 
 document.getElementById("save-button").addEventListener("click", function (event) {
@@ -435,12 +441,42 @@ window.onload = function() {
     update_price_and_level()
     
     
-    document.getElementById("population").textContent = game_data.population 
-    document.getElementById("money").textContent = game_data.money
-    document.getElementById("money-per-second").textContent = game_data.money_per_second
-    document.getElementById("workers").textContent = game_data.workers
-    document.getElementById("worker-price").textContent = game_data.worker_price
-    document.getElementById("worker-gen").textContent = Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100
+    document.getElementById("population").textContent = formatNum(game_data.population)
+    document.getElementById("money").textContent = formatNum(game_data.money)
+    document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
+    document.getElementById("workers").textContent = formatNum(game_data.workers)
+    document.getElementById("worker-price").textContent = formatNum(game_data.worker_price)
+    document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
 
 }
 
+
+function formatNum(num) {
+    if (num < 1000) {
+        return num
+    }
+    const unitAbbreviations = ["K", "M", "B", "T", "Q", "Qi", "Sx", "Oc", "No", "Dc"]
+    let index = 0
+    
+    while (num >= 1000 && index < unitAbbreviations.length) {
+        num /= 1000
+        index ++
+    }
+    
+    
+    return parseFloat(num.toFixed(2)) + unitAbbreviations[index-1]
+
+}
+
+function prestige() {
+    let prestige_level = game_data.prestige_level
+    let prestige_cost = game_data.prestige_cost
+    
+    prestige_level ++
+    prestige_cost *= 10
+
+    Object.assign(game_data, JSON.parse(JSON.stringify(default_game_data)))
+
+    game_data.prestige_level = prestige_level
+    game_data.prestige_cost = prestige_cost
+}
