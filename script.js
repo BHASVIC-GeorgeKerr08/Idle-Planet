@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 0,
+    population: 200000,
     money: 0,
     money_per_second: 0, 
 
@@ -178,6 +178,7 @@ const default_game_data = JSON.parse(JSON.stringify(game_data))
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
 document.getElementById("planet-button").addEventListener("click", function (event) { 
     game_data.population += 1 * (1 + (game_data.upgrades.click_surge.level * 2)/100)
+    game_data.population *= game_data.prestige_multiplier
     game_data.population = Math.round(game_data.population * 100) / 100
     game_data.money_per_second = game_data.population * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 
@@ -226,6 +227,7 @@ let interval
 function worker_click() {
     clearInterval(interval)
     game_data.population += game_data.total_worker_gen * (1 + (game_data.upgrades.worker_training.level * 20) / 100)
+    game_data.population *= game_data.prestige_multiplier
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
     game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
@@ -304,10 +306,7 @@ function update_price_and_level() {
     }
 }
 
-setInterval(() => {
-    update_price_and_level()
-    console.log(game_data.upgrades.click_surge.price_multiplier)
-}, 1000)
+
 
 
 
@@ -458,7 +457,7 @@ function update_game_displays() {
     document.getElementById("workers").textContent = formatNum(game_data.workers)
     document.getElementById("worker-price").textContent = formatNum(game_data.worker_price)
     document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
-    document.getElementById("population-cost").textContent = formatNum(game_data.prestige_cost)
+    document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
 }
 
 function formatNum(num) {
@@ -500,4 +499,10 @@ document.getElementById("prestige-button").addEventListener("click", function (e
         
     }
 })
+
+setInterval(() => {
+    game_data.prestige_multiplier = (1 + 0.1 * (game_data.population / 100000)).toFixed(1)
+    document.getElementById("population-multiplier").textContent = game_data.prestige_multiplier
+    
+}, 1000)
 
