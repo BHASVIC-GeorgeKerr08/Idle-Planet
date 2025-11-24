@@ -4,8 +4,8 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 99,
-    money: 500,
+    population: 0,
+    money: 0,
     money_per_second: 0, 
 
     // WORKERS
@@ -186,7 +186,7 @@ document.getElementById("planet-button").addEventListener("click", function (eve
         game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100
     }                         
     document.getElementById("population").textContent = formatNum(game_data.population)
-    document.getElementById("money-per-second").textContent = game_data.money_per_second
+    document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
 
 })
 
@@ -230,7 +230,7 @@ function worker_click() {
     game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
     document.getElementById("population").textContent = formatNum(game_data.population)
-    document.getElementById("money-per-second").textContent = game_data.money_per_second
+    document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
     interval = setInterval(worker_click, game_data.worker_speed * 1000)
 }
 
@@ -261,7 +261,7 @@ function upgrade(upgrade_element) {
             if(upgrade_name == "industry_boom") {   
                 game_data.money_per_second *= 1.2
                 game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
-                document.getElementById("money-per-second").textContent = game_data.money_per_second
+                document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
             } else if (upgrade_name =="worker_efficiency" && game_data.worker_speed > 0.5) {
                 game_data.worker_speed -= 0.1
                 game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
@@ -325,6 +325,12 @@ setInterval(() => {
         document.getElementById("worker-button").style.color = "green"
     } else {
         document.getElementById("worker-button").style.color = "red"
+    }
+
+    if(game_data.population >= game_data.prestige_cost) {
+        document.getElementById("prestige-button").style.color = "green"
+    } else {
+        document.getElementById("prestige-button").style.color = "red"
     }
 }, 1000)
 
@@ -428,7 +434,7 @@ function save_data() {
 
 setInterval(() => {
     save_data()
-}, 500)
+}, 5000)
 
 
 document.getElementById("save-button").addEventListener("click", function (event) {
@@ -437,6 +443,11 @@ document.getElementById("save-button").addEventListener("click", function (event
 
 window.onload = function() {
     Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
+    update_game_displays()
+
+}
+
+function update_game_displays() {
     update_prices()
     update_price_and_level()
     
@@ -447,9 +458,8 @@ window.onload = function() {
     document.getElementById("workers").textContent = formatNum(game_data.workers)
     document.getElementById("worker-price").textContent = formatNum(game_data.worker_price)
     document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
-
+    document.getElementById("population-cost").textContent = formatNum(game_data.prestige_cost)
 }
-
 
 function formatNum(num) {
     if (num < 1000) {
@@ -479,4 +489,15 @@ function prestige() {
 
     game_data.prestige_level = prestige_level
     game_data.prestige_cost = prestige_cost
+
+    localStorage.removeItem("game_data")
 }
+
+document.getElementById("prestige-button").addEventListener("click", function (event) {
+    if(game_data.population >= game_data.prestige_cost) {
+        prestige()
+        update_game_displays()
+        
+    }
+})
+
