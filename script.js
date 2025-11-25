@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 200000,
+    population: 10000000,
     money: 0,
     money_per_second: 0, 
 
@@ -157,16 +157,18 @@ const game_data = {
             max_purchase: 0,
         },
     },
-
+    
     // PRESTIGE
 
     prestige_level: 0,
     prestige_cost: 1000000,
-    prestige_multiplier: 1.0,
+    current_prestige_multiplier: 1.0,
+    next_prestige_multiplier: 1.0,
   
 }
 
 const default_game_data = JSON.parse(JSON.stringify(game_data))
+default_game_data.population = 0
 
 // ========== FUNCTIONS ========== //
 
@@ -178,7 +180,7 @@ const default_game_data = JSON.parse(JSON.stringify(game_data))
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
 document.getElementById("planet-button").addEventListener("click", function (event) { 
     game_data.population += 1 * (1 + (game_data.upgrades.click_surge.level * 2)/100)
-    game_data.population *= game_data.prestige_multiplier
+    game_data.population += Number(game_data.current_prestige_multiplier)
     game_data.population = Math.round(game_data.population * 100) / 100
     game_data.money_per_second = game_data.population * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 
@@ -196,7 +198,6 @@ document.getElementById("worker-button").addEventListener("click", function (eve
     if (game_data.money > game_data.worker_price) {
         game_data.workers ++
         game_data.money -= game_data.worker_price
-
         game_data.worker_price *= 1 + game_data.worker_price_multiplier
         game_data.worker_price = Math.round(game_data.worker_price * 100) / 100
         game_data.worker_price_multiplier += 0.05
@@ -227,7 +228,7 @@ let interval
 function worker_click() {
     clearInterval(interval)
     game_data.population += game_data.total_worker_gen * (1 + (game_data.upgrades.worker_training.level * 20) / 100)
-    game_data.population *= game_data.prestige_multiplier
+    game_data.population += game_data.workers * Number(game_data.current_prestige_multiplier)
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
     game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
@@ -428,7 +429,7 @@ function update_prices() {
 
      
 function save_data() {
-    localStorage.setItem("game_data", JSON.stringify(game_data))
+    //localStorage.setItem("game_data", JSON.stringify(game_data))
 }
 
 setInterval(() => {
@@ -480,7 +481,8 @@ function formatNum(num) {
 function prestige() {
     let prestige_level = game_data.prestige_level
     let prestige_cost = game_data.prestige_cost
-    
+    let current_prestige_multiplier = game_data.next_prestige_multiplier
+
     prestige_level ++
     prestige_cost *= 10
 
@@ -488,6 +490,7 @@ function prestige() {
 
     game_data.prestige_level = prestige_level
     game_data.prestige_cost = prestige_cost
+    game_data.current_prestige_multiplier = current_prestige_multiplier
 
     localStorage.removeItem("game_data")
 }
@@ -501,8 +504,9 @@ document.getElementById("prestige-button").addEventListener("click", function (e
 })
 
 setInterval(() => {
-    game_data.prestige_multiplier = (1 + 0.1 * (game_data.population / 100000)).toFixed(1)
-    document.getElementById("population-multiplier").textContent = game_data.prestige_multiplier
+  
+    game_data.next_prestige_multiplier = (1 + 0.1 * (game_data.population / 100000)).toFixed(1)
+    document.getElementById("population-multiplier").textContent = game_data.next_prestige_multiplier
     
 }, 1000)
 
