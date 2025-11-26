@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 10000000,
+    population: 0,
     money: 0,
     money_per_second: 0, 
 
@@ -23,7 +23,7 @@ const game_data = {
     upgrade_elements : [
         'click-surge', 'income-boost', 'industry-boom',
         'worker-training', 'worker-efficiency',
-        'population-multiplier-boost', 'quicker-prestige', 'permanent-click-boost',
+        'population-multiplier-boost', 'quicker-prestige',
         'double-minigame-reward', 'temporary-population-surge', 
         'gamble-luck','win-streak',
         'achievement-gem-boost', 'achievement-xp-boost',
@@ -93,15 +93,6 @@ const game_data = {
             base_price: 5000,
             max_purchase: 0,
         },
-        permanent_click_boost: {
-            price: 20000,
-            level: 0,
-            price_multiplier: 0.1,
-            base_multiplier: 0.1,
-            multiplier_increase: 0.08,
-            base_price: 20000,
-            max_purchase: 0,
-        },
         double_minigame_reward: {
             price: 30000,
             level: 0,
@@ -162,9 +153,20 @@ const game_data = {
 
     prestige_level: 0,
     prestige_cost: 1000000,
-    current_prestige_multiplier: 1.0,
+    current_prestige_multiplier: 0,
     next_prestige_multiplier: 1.0,
   
+    // POPULATION GAMBLING
+
+    win_chance: 0.5,
+    win_multiplier: 1.5,
+    win_return: 0,
+    bet: 0,
+
+    sounds: {
+        win : new Audio("win.mp3"),
+        lose: new Audio("lose.mp3")
+    }
 }
 
 const default_game_data = JSON.parse(JSON.stringify(game_data))
@@ -251,7 +253,10 @@ var worker_efficiency_allowed = true
 function upgrade(upgrade_element) {
     let upgrade_name = upgrade_element.replaceAll("-", "_")
     let upgrade_number = 0
-    if(game_data.money >= game_data.upgrades[upgrade_name].price && worker_efficiency_allowed == true) {
+    if(game_data.money >= game_data.upgrades[upgrade_name].price) {
+        if(upgrade_name == "worker_efficiency" && worker_efficiency_allowed == false) {
+            return null
+        }
         if(game_data.multi_purchase_state == 0) {
             game_data.upgrades[upgrade_name].level += game_data.upgrades[upgrade_name].max_purchase   
             upgrade_number = game_data.upgrades[upgrade_name].max_purchase
@@ -276,6 +281,9 @@ function upgrade(upgrade_element) {
                 game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
                 game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100
                 document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
+            } else if(upgrade_name == "quicker_prestige") {
+                game_data.prestige_cost *= 0.95
+                document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
             }
         }
 
@@ -332,6 +340,8 @@ setInterval(() => {
     } else {
         document.getElementById("prestige-button").style.color = "red"
     }
+
+    check_gamble()
 }, 1000)
 
 
@@ -451,7 +461,6 @@ function update_game_displays() {
     update_prices()
     update_price_and_level()
     
-    
     document.getElementById("population").textContent = formatNum(game_data.population)
     document.getElementById("money").textContent = formatNum(game_data.money)
     document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
@@ -459,6 +468,9 @@ function update_game_displays() {
     document.getElementById("worker-price").textContent = formatNum(game_data.worker_price)
     document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
     document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
+    document.getElementById("win").hidden = true
+    document.getElementById("loss").hidden = true
+    
 }
 
 function formatNum(num) {
@@ -482,6 +494,7 @@ function prestige() {
     let prestige_level = game_data.prestige_level
     let prestige_cost = game_data.prestige_cost
     let current_prestige_multiplier = game_data.next_prestige_multiplier
+    let quicker_prestige = JSON.parse(JSON.stringify(game_data.upgrades.quicker_prestige))
 
     prestige_level ++
     prestige_cost *= 10
@@ -491,6 +504,7 @@ function prestige() {
     game_data.prestige_level = prestige_level
     game_data.prestige_cost = prestige_cost
     game_data.current_prestige_multiplier = current_prestige_multiplier
+    Object.assign(game_data.upgrades.quicker_prestige, quicker_prestige)
 
     localStorage.removeItem("game_data")
 }
@@ -505,8 +519,91 @@ document.getElementById("prestige-button").addEventListener("click", function (e
 
 setInterval(() => {
   
-    game_data.next_prestige_multiplier = (1 + 0.1 * (game_data.population / 100000)).toFixed(1)
+    game_data.next_prestige_multiplier = parseFloat(((1 + 0.1 * (game_data.population / 100000)) + (0.5 * game_data.upgrades.population_multiplier_boost.level)).toFixed(1))
     document.getElementById("population-multiplier").textContent = game_data.next_prestige_multiplier
     
 }, 1000)
+
+
+function check_gamble() {
+    if(game_data.population >= game_data.bet && !isNaN(game_data.bet) && game_data.bet > 0) {
+        document.getElementById("gamble-button").style.color = "green"
+    } else {
+        document.getElementById("gamble-button").style.color = "red"
+    }
+}
+
+function calculate_gamble_stats() {
+    let betLevel = 1000
+
+    while(game_data.bet >= betLevel) {
+        game_data.win_chance -= 0.05
+        game_data.win_multiplier += 0.25
+        betLevel *= 10
+
+        if(game_data.win_chance <= 0.05) {
+            game_data.win_chance = 0.05 
+            break
+        }
+    }
+
+    game_data.win_return = game_data.bet * game_data.win_multiplier
+
+    
+}
+
+document.getElementById("gamble-amount").addEventListener("input", function(event) {
+    if(isNaN(this.value)) {
+        document.getElementById("win-return").textContent = "Enter valid number"
+    } else if(this.value == 0) {
+        document.getElementById("win-return").textContent = "0"
+    } else {
+        game_data.bet = this.value
+        check_gamble()
+        calculate_gamble_stats()
+        document.getElementById("win-return").textContent = formatNum(game_data.win_return)
+    }
+})
+
+function gamble() {
+
+    
+    if(game_data.population >= game_data.bet) {
+        let random_roll = Math.random()
+        if (random_roll <= game_data.win_chance) {
+            game_data.population -= game_data.bet
+            game_data.population += game_data.bet * game_data.win_multiplier
+            document.getElementById("win").hidden = false
+            game_data.sounds.win.play()
+        } else {
+            game_data.population -= game_data.bet
+            document.getElementById("loss").hidden = false
+            game_data.sounds.lose.play()
+        }
+
+        document.getElementById("gamble-amount").value = ""
+        game_data.bet = 0
+        calculate_gamble_stats()
+        document.getElementById("win-return").textContent = formatNum(game_data.win_return)
+        setTimeout(() => {
+            document.getElementById("win").hidden = true
+            document.getElementById("loss").hidden = true
+        }, 2000)
+        
+        game_data.money_per_second = game_data.population * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100)) 
+        game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
+        document.getElementById("money-per-second").textContent = game_data.money_per_second
+        document.getElementById("population").textContent = formatNum(game_data.population)
+      
+    }
+    
+}
+
+
+document.getElementById("gamble-button").addEventListener("click", function(event) {
+    if(!isNaN(game_data.bet) && game_data.bet > 0) {
+        gamble()
+    } 
+})
+
 
