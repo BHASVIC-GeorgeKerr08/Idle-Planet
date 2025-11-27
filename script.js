@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 0,
+    population: 10000000,
     money: 0,
     money_per_second: 0, 
 
@@ -117,7 +117,7 @@ const game_data = {
             price_multiplier: 0.1,
             base_multiplier: 0.1,
             multiplier_increase: 0.125,
-            base_price: 1000,
+            base_price: 50000,
             max_purchase: 0,
         },
         win_streak: {
@@ -166,7 +166,11 @@ const game_data = {
     sounds: {
         win : new Audio("win.mp3"),
         lose: new Audio("lose.mp3")
-    }
+    },
+
+    win_streak: 0,
+
+
 }
 
 const default_game_data = JSON.parse(JSON.stringify(game_data))
@@ -181,6 +185,7 @@ default_game_data.population = 0
 // Click event listener for planet button
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
 document.getElementById("planet-button").addEventListener("click", function (event) { 
+    console.log(game_data.upgrades.gamble_luck.price)
     game_data.population += 1 * (1 + (game_data.upgrades.click_surge.level * 2)/100)
     game_data.population += Number(game_data.current_prestige_multiplier)
     game_data.population = Math.round(game_data.population * 100) / 100
@@ -284,7 +289,9 @@ function upgrade(upgrade_element) {
             } else if(upgrade_name == "quicker_prestige") {
                 game_data.prestige_cost *= 0.95
                 document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
-            }
+            } else if (upgrade_name == "gamble_luck") {
+                game_data.win_chance += 0.05
+            } 
         }
 
         if(game_data.worker_speed <= 0.5) {
@@ -370,6 +377,7 @@ function update_prices() {
     let upgrade_number = 0
     for(const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
+        console.log("test")
         current_upgrade.price = current_upgrade.base_price
         current_upgrade.price_multiplier = current_upgrade.base_multiplier
         var prices = []
@@ -535,7 +543,8 @@ function check_gamble() {
 
 function calculate_gamble_stats() {
     let betLevel = 1000
-
+    game_data.win_chance = 0.5
+    game_data.win_multiplier = 1.5
     while(game_data.bet >= betLevel) {
         game_data.win_chance -= 0.05
         game_data.win_multiplier += 0.25
@@ -566,19 +575,22 @@ document.getElementById("gamble-amount").addEventListener("input", function(even
 })
 
 function gamble() {
-
-    
+  
     if(game_data.population >= game_data.bet) {
         let random_roll = Math.random()
+        game_data.win_multiplier = game_data.win_streak * 0.5
+        console.log(game_data.win_chance)
         if (random_roll <= game_data.win_chance) {
             game_data.population -= game_data.bet
             game_data.population += game_data.bet * game_data.win_multiplier
             document.getElementById("win").hidden = false
             game_data.sounds.win.play()
+            game_data.win_streak ++
         } else {
             game_data.population -= game_data.bet
             document.getElementById("loss").hidden = false
             game_data.sounds.lose.play()
+            game_data.win_streak = 0
         }
 
         document.getElementById("gamble-amount").value = ""
@@ -598,7 +610,6 @@ function gamble() {
     }
     
 }
-
 
 document.getElementById("gamble-button").addEventListener("click", function(event) {
     if(!isNaN(game_data.bet) && game_data.bet > 0) {
