@@ -4,8 +4,8 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 10000000,
-    money: 0,
+    population: 0,
+    money: 10000000000,
     money_per_second: 0, 
 
     // WORKERS
@@ -112,21 +112,21 @@ const game_data = {
             max_purchase: 0,
         },
         gamble_luck: {
-            price: 50000,
+            price: 500000,
             level: 0,
             price_multiplier: 0.1,
             base_multiplier: 0.1,
             multiplier_increase: 0.125,
-            base_price: 50000,
+            base_price: 500000,
             max_purchase: 0,
         },
         win_streak: {
-            price: 5000,
+            price: 500000,
             level: 0,
             price_multiplier: 0.1,
             base_multiplier: 0.1,
             multiplier_increase: 0.07,
-            base_price: 5000,
+            base_price: 500000,
             max_purchase: 0,
         },
         achievement_gem_boost: {
@@ -162,16 +162,40 @@ const game_data = {
     win_multiplier: 1.5,
     win_return: 0,
     bet: 0,
+    win_streak: 0,
 
     sounds: {
         win : new Audio("win.mp3"),
         lose: new Audio("lose.mp3")
     },
 
-    win_streak: 0,
+    // ACHIEVEMENTS
 
-
+    achievements : {
+        clicks: {
+            progress: 0,
+            goal: 100,
+            gems: 5,
+            xp: 25,
+            element: document.getElementById("achievement-clicks"),
+        },
+        money: {
+            progress: 0,
+            goal: 100,
+            gems: 5,
+            xp: 25,
+            element: document.getElementById("achievement-money"),
+        },
+        gamble: {
+            progress: 0,
+            goal: 5,
+            gems: 10,
+            xp: 50,
+            element: document.getElementById("achievement-gamble"),
+        },
+    }   
 }
+
 
 const default_game_data = JSON.parse(JSON.stringify(game_data))
 default_game_data.population = 0
@@ -185,7 +209,6 @@ default_game_data.population = 0
 // Click event listener for planet button
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
 document.getElementById("planet-button").addEventListener("click", function (event) { 
-    console.log(game_data.upgrades.gamble_luck.price)
     game_data.population += 1 * (1 + (game_data.upgrades.click_surge.level * 2)/100)
     game_data.population += Number(game_data.current_prestige_multiplier)
     game_data.population = Math.round(game_data.population * 100) / 100
@@ -255,11 +278,21 @@ for(let i = 0; i < game_data.upgrade_elements.length; i++) {
      
 
 var worker_efficiency_allowed = true
+var gamble_luck_allowed = true
 function upgrade(upgrade_element) {
     let upgrade_name = upgrade_element.replaceAll("-", "_")
     let upgrade_number = 0
     if(game_data.money >= game_data.upgrades[upgrade_name].price) {
         if(upgrade_name == "worker_efficiency" && worker_efficiency_allowed == false) {
+            alert("Worker speed is capped at 0.5s!")
+            return null
+        }
+        if(upgrade_name == "gamble_luck" && gamble_luck_allowed == false) {
+            alert("Win chance is capped at 75%")
+            return null
+        }
+        if(upgrade_name == "population_multiplier_boost" && game_data.next_prestige_multiplier >= 50) {
+            alert("Population multiplier is capped at x50!")
             return null
         }
         if(game_data.multi_purchase_state == 0) {
@@ -289,13 +322,19 @@ function upgrade(upgrade_element) {
             } else if(upgrade_name == "quicker_prestige") {
                 game_data.prestige_cost *= 0.95
                 document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
-            } else if (upgrade_name == "gamble_luck") {
+            } else if (upgrade_name == "gamble_luck" && (game_data.win_chance + 0.05 <= 0.75)) {
                 game_data.win_chance += 0.05
+                game_data.win_chance = Math.round(game_data.win_chance * 100) / 100
+                document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
             } 
         }
 
         if(game_data.worker_speed <= 0.5) {
             worker_efficiency_allowed = false
+        }
+        
+        if(game_data.win_chance + 0.05 > 0.75) {
+            gamble_luck_allowed = false
         }
 
 
@@ -377,7 +416,6 @@ function update_prices() {
     let upgrade_number = 0
     for(const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
-        console.log("test")
         current_upgrade.price = current_upgrade.base_price
         current_upgrade.price_multiplier = current_upgrade.base_multiplier
         var prices = []
@@ -478,6 +516,7 @@ function update_game_displays() {
     document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
     document.getElementById("win").hidden = true
     document.getElementById("loss").hidden = true
+    document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
     
 }
 
@@ -526,8 +565,11 @@ document.getElementById("prestige-button").addEventListener("click", function (e
 })
 
 setInterval(() => {
-  
+
     game_data.next_prestige_multiplier = parseFloat(((1 + 0.1 * (game_data.population / 100000)) + (0.5 * game_data.upgrades.population_multiplier_boost.level)).toFixed(1))
+    if(game_data.next_prestige_multiplier > 50) {
+        game_data.next_prestige_multiplier = 50
+    }
     document.getElementById("population-multiplier").textContent = game_data.next_prestige_multiplier
     
 }, 1000)
@@ -544,6 +586,10 @@ function check_gamble() {
 function calculate_gamble_stats() {
     let betLevel = 1000
     game_data.win_chance = 0.5
+    game_data.win_chance += game_data.upgrades.gamble_luck.level * 0.05
+    if(game_data.win_streak > 1) {
+        game_data.win_chance += (game_data.upgrades.win_streak.level * 0.05) * (game_data.win_streak-1)
+    }
     game_data.win_multiplier = 1.5
     while(game_data.bet >= betLevel) {
         game_data.win_chance -= 0.05
@@ -557,9 +603,11 @@ function calculate_gamble_stats() {
     }
 
     game_data.win_return = game_data.bet * game_data.win_multiplier
+    game_data.win_chance = Math.round(game_data.win_chance * 100) / 100
 
     
 }
+
 
 document.getElementById("gamble-amount").addEventListener("input", function(event) {
     if(isNaN(this.value)) {
@@ -571,16 +619,21 @@ document.getElementById("gamble-amount").addEventListener("input", function(even
         check_gamble()
         calculate_gamble_stats()
         document.getElementById("win-return").textContent = formatNum(game_data.win_return)
+        document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
+        if(game_data.win_chance >= 0.5) {
+            document.getElementById("win-chance-display").style.color = "green" 
+        } else if(game_data.win_chance >= 0.35 && game_data.win_chance <= 0.45) {
+            document.getElementById("win-chance-display").style.color = "orange"
+        } else if(game_data.win_chance < 0.35) { 
+            document.getElementById("win-chance-display").style.color = "red"
+        }
     }
 })
 
 function gamble() {
-  
     if(game_data.population >= game_data.bet) {
         let random_roll = Math.random()
-        game_data.win_multiplier = game_data.win_streak * 0.5
-        console.log(game_data.win_chance)
-        if (random_roll <= game_data.win_chance) {
+        if (true) {
             game_data.population -= game_data.bet
             game_data.population += game_data.bet * game_data.win_multiplier
             document.getElementById("win").hidden = false
@@ -597,6 +650,7 @@ function gamble() {
         game_data.bet = 0
         calculate_gamble_stats()
         document.getElementById("win-return").textContent = formatNum(game_data.win_return)
+        document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
         setTimeout(() => {
             document.getElementById("win").hidden = true
             document.getElementById("loss").hidden = true
