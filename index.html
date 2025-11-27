@@ -25,14 +25,18 @@
     </div>
     <div class="achievements">
         <h2>📊Achievements</h2>
-        <div class="achievement">
-            <h3>Achievement 1 - 0/100</h3>
+        <div class="achievement" id="achievement-clicks">
+            <div class="progress-fill" id="achievement-money-progress-fill"></div>
+            <h3>Click planet 100 times - <span id="achievement-clicks-completion">0</span>/<span id="achievement-clicks-goal">100</span></h3>
         </div>
-        <div class="achievement">
-            <h3>Achievement 2 - 0/100</h3>
+
+        <div class="achievement" id="achievement-money">
+            <div class="progress-fill" id="achievement-money-progress-fill"></div>
+            <h3>Earn 100 money - <span id="achievement-money-completion">0</span>/<span id="achievement-money-goal">100</span></h3>
         </div>
-        <div class="achievement">
-            <h3>Achievement 3 - 0/100</h3>
+        <div class="achievement" id="achievement-gambles">
+            <div class="progress-fill" id="achievement-money-progress-fill"></div>
+            <h3>Win 5 gambles in a row - <span id="achievement-gambles-completion">0</span>/<span id="achievement-gambles-goal">100</span></h3>
         </div>
     </div>
         
@@ -57,7 +61,8 @@
                 <button id="gamble-button" class="gamble-button">Gamble</button>
             
             </div>
-            <h4 style="margin: 5px; text-align: left;">Win return: <span id="win-return">0</span></h4>
+            <h4 style="margin: 5px; text-align: left; color: green">Win return: <span id="win-return">0</span></h4>
+            <h4 style="margin: 5px; text-align: left; color: green" id="win-chance-display">Win chance: <span id="win-chance">0</span></h4>
             <div class="separator"></div>
             <h3><span id="win" class="gamble-win">YOU WON</span> <span id="loss" class="gamble-loss">YOU LOST</span></h3>
         </div>
