@@ -273,7 +273,7 @@ body {
 
 
 .population-gambling {
-    height: 200px;
+    height: 250px;
 }
 
 
@@ -513,4 +513,32 @@ body {
 
 
 
- 
+ .progress-fill {
+    border-radius: 10px;
+    background: linear-gradient(90deg, #3cff6b, #6affb8);
+    width: 0%;
+    height: 100%;
+    transition: width 0.4s ease;
+    position: absolute;
+    z-index: 0;
+    left: 0;
+}
+
+
+.achievement {
+    border: 2px solid white;
+    border-radius: 10px;
+    margin: 10px;
+    text-align: center;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.achievement h3 {
+    z-index: 1;
+}
