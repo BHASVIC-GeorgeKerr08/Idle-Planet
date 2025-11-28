@@ -209,6 +209,7 @@ default_game_data.population = 0
 // Click event listener for planet button
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
 document.getElementById("planet-button").addEventListener("click", function (event) { 
+    game_data.achievements.clicks.element.querySelector("#achievement-clicks-progress-fill").style.width = `${game_data.population}%`
     game_data.population += 1 * (1 + (game_data.upgrades.click_surge.level * 2)/100)
     game_data.population += Number(game_data.current_prestige_multiplier)
     game_data.population = Math.round(game_data.population * 100) / 100
@@ -633,7 +634,7 @@ document.getElementById("gamble-amount").addEventListener("input", function(even
 function gamble() {
     if(game_data.population >= game_data.bet) {
         let random_roll = Math.random()
-        if (true) {
+        if (random_roll < game_data.win_chance) {
             game_data.population -= game_data.bet
             game_data.population += game_data.bet * game_data.win_multiplier
             document.getElementById("win").hidden = false
@@ -670,5 +671,4 @@ document.getElementById("gamble-button").addEventListener("click", function(even
         gamble()
     } 
 })
-
 
