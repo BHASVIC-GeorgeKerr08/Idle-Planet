@@ -18,28 +18,30 @@
             </button>
             <h1>🌍Idle Planet - <span>Earth</span></h1>
         </div>
+        
         <div class="level">
-            <div class="progress-bar"></div>
-            <h3>Level 1 - 0/1000</h3>
+            <div class="progress-bar" id="level-progress-bar"></div>
+            <h3>Level <span id="level">1</span> - <span id="xp">0</span>/<span id="level-goal">1000</span></h3>
         </div>
     </div>
     <div class="achievements">
         <h2>📊Achievements</h2>
         <div class="achievement" id="achievement-clicks">
             <div class="progress-fill" id="achievement-clicks-progress-fill"></div>
-            <h3>Click planet 100 times - <span id="achievement-clicks-completion">0</span>/<span id="achievement-clicks-goal">100</span></h3>
+            <h3>Click planet 100 times </h3><span id="achievement-clicks-completion">&nbsp; - 0/100</span>
         </div>
 
         <div class="achievement" id="achievement-money">
             <div class="progress-fill" id="achievement-money-progress-fill"></div>
-            <h3>Earn 100 money - <span id="achievement-money-completion">0</span>/<span id="achievement-money-goal">100</span></h3>
+            <h3>Earn 100 money </h3><span id="achievement-money-completion">&nbsp; - 0/100</span>
         </div>
         <div class="achievement" id="achievement-gambles">
             <div class="progress-fill" id="achievement-money-progress-fill"></div>
-            <h3>Win 5 gambles in a row - <span id="achievement-gambles-completion">0</span>/<span id="achievement-gambles-goal">100</span></h3>
+            <h3>Win 5 gambles in a row </h3><span id="achievement-gambles-completion">&nbsp; - 0/5</span>
         </div>
     </div>
-        
+
+    
     <div class="left">
         <div class="minigames">
             <h2>🕹️Minigames</h2>
@@ -84,20 +86,20 @@
         </div>
     </div>
     <div class="effects">
-           <div class="gems"><h3>Gems: </h3></div>
+           <div class="gems"><h3>Gems: <span id="gems">0</span></h3></div>
         <h2>🪄Effects</h2>
         <div class="effects-list">
-            <div class="effect-row">
-                <div class="effect"><h3>Effect 1</h3></div>
-                <div class="effect-price"><span>Price</span></div>
+            <div class="effect-row" id="effect-row">
+                <div class="effect" id="click-effect-title"><h3>Double click power <br> (10 secs)</h3></div>
+                <div class="effect-price"><button id="click-effect-button"><span>Price</span></button></div>
+            </div>
+            <div class="effect-row" id="effect-row">
+                <div class="effect" id="money-effect-title"><h3>Double money <br> (20 secs)</h3></div>
+                <div class="effect-price" id="click-effect"><button id="money-effect-button"><span>Price</span></button></div>
             </div>
             <div class="effect-row">
-                <div class="effect"><h3>Effect 2</h3></div>
-                <div class="effect-price"><span>Price</span></div>
-            </div>
-            <div class="effect-row">
-                 <div class="effect"><h3>Effect 3</h3></div>
-                 <div class="effect-price"><span>Price</span></div>
+                 <div class="effect" id="worker-effect-title"><h3>Double worker gen <br> (30 secs)</h3></div>
+                 <div class="effect-price"><button id="worker-effect-button"><span>Price</span></button></div>
             </div>
         </div>
     </div>
