@@ -5,7 +5,7 @@
 const game_data = {
     // POPULATION AND MONEY
     population: 0,
-    money: 500,
+    money: 0,
     money_per_second: 0, 
 
     // WORKERS
@@ -488,49 +488,63 @@ document.getElementById("multi-purchase-button").addEventListener("click", funct
     
 })
 
+// Function that updates prices when multi-purchase button is clicked
 function update_prices() { 
-    let upgrade_number = 0
+    
+    // Iterates over shop upgrade objects in game_data
     for(const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
+        // Resets upgrade price and price multiplier to base values
         current_upgrade.price = current_upgrade.base_price
-        current_upgrade.price_multiplier = current_upgrade.base_multiplier
+        current_upgrade.price_multiplier = 0.1
         var prices = []
         prices.push(current_upgrade.price)
         var count = 1
         var next_price = 0
         var prices_sum = 0
+        //MAX multi-purchase setting
         if(game_data.multi_purchase_state == 0) {
-    
             while(true) {
+                // Calculates the next price of the upgrade, by multiplying previous price by current price multiplier
                 next_price = prices[count -1] * (1 + current_upgrade.price_multiplier)
-              
+                
+                
                 prices_sum = 0
+                // Calculates the sum of the upgrade prices array
                 for(let i = 0; i<prices.length; i++) {
                     prices_sum += prices[i]
                 }
 
+                // Checks if the next price of the upgrade makes the total too much to afford
                 if(prices_sum + next_price > game_data.money) {  
+                    // Exits loop if so
                     break
                 }
 
+                // Adds next price of upgrade to array and increments price multiplier and count
                 prices.push(next_price)
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
-                count ++
-             
+                count ++   
             }
 
+            // Sets upgrade price to the sum of the total cost of buying all the ugprade the player can afford
             current_upgrade.price = prices_sum
-            current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
+            // Sets the max purchase number to the loop count, to give the number of times the player can purcahse the upgrade
             current_upgrade.max_purchase = count 
 
+            // Updates the upgrade purchase number in HTML 
             document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${current_upgrade.max_purchase}`
             upgrade_number ++
 
+        // x1, x10, x100 Multi-purchase settings:
         } else {
-
+            
+            // Runs either 1, 10, or 100 times
             for (let i = 0; i<game_data.multi_purchase_state-1; i++) {
+                // Calculates next price of upgrade and adds to array
                 next_price = prices[count -1] * (1 + current_upgrade.price_multiplier)
                 prices.push(next_price)
+                // Increments price multiplier and count
                 current_upgrade.price_multiplier += current_upgrade.multiplier_increase
                 count ++
             }
@@ -540,13 +554,15 @@ function update_prices() {
                 prices_sum += prices[i]
             }
 
+            // Sets upgrade price to the sum of the total cost of buying all the ugprade the player can afford
             current_upgrade.price = prices_sum
             
+            // Updates the upgrade purchase number in HTML 
             document.getElementById(`${game_data.upgrade_elements[upgrade_number]}-amount`).textContent = `x${game_data.multi_purchase_state}`
             upgrade_number ++
         }
 
-        current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
+        // Updates upgrade price and level displays
         update_price_and_level()
     }
 }
@@ -963,4 +979,3 @@ setInterval(() =>  {
         game_data.effects[game_data.effect_names[i]].button.textContent = `${game_data.effects[game_data.effect_names[i]].cost} gems`
     }
 }, 1000)
-
