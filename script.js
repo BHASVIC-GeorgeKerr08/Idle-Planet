@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 0,
+    population: 1000000,
     money: 0,
     money_per_second: 0, 
 
@@ -290,38 +290,42 @@ document.getElementById("worker-button").addEventListener("click", function (eve
 
 // ========== LOOPS ========== //
 
-// Loop that runs every second, which calls the increaseMoney() Function
+// Infinite loop that increases money by money per second
 setInterval(() => {
-    let money = Math.round(game_data.money * 100) / 100
-    game_data.money += game_data.money_per_second
+    let money = Math.round(game_data.money * 100) / 100 // Creates a temporary variable which stores the population before increase
+    game_data.money += game_data.money_per_second 
+    // Adds the population increase if the double click effect is active, which doubles the total increase.
     if(game_data.effects.double_money.active) {
         game_data.money += game_data.money - money
     }
     game_data.money = Math.round(game_data.money * 100) / 100 //Removes extra, unwanted decimal places 
     document.getElementById("money").textContent = formatNum(game_data.money)
-    update_achievement("money", game_data.money - money)
+    update_achievement("money", game_data.money - money) // Updates money achievement
     
 }, 1000)
 
 
 let interval
-
+// Function that handles worker generation
 function worker_click() {
     clearInterval(interval)
     let population = game_data.population
+    // Increases population by the worker gen value, with boost from worker training upgrade
     game_data.population += game_data.total_worker_gen * (1 + (game_data.upgrades.worker_training.level * 20) / 100)
-    game_data.population += game_data.workers * Number(game_data.current_prestige_multiplier)
+    game_data.population += game_data.workers * Number(game_data.current_prestige_multiplier) // Applies prestige multiplier to population increase
     if(game_data.effects.double_worker_gen.active) {
         game_data.population += game_data.population - population
     }
     game_data.population = Math.round(game_data.population * 100) / 100 //Removes extra, unwanted decimal places 
-    game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level  * 10) /100))   
+    game_data.money_per_second += game_data.total_worker_gen * (0.01 * (1 + (game_data.upgrades.income_boost.level * 10) / 100)) // Recalculates money per second
     game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
     document.getElementById("population").textContent = formatNum(game_data.population)
     document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
     interval = setInterval(worker_click, game_data.worker_speed * 1000)
 }
 
+
+// Runs worker click infinitely, sets interval to worker speed
 setTimeout(worker_click, game_data.worker_speed * 1000)
 
 
@@ -330,90 +334,107 @@ for(let i = 0; i < game_data.upgrade_elements.length; i++) {
         upgrade(game_data.upgrade_elements[i])
     })
 }
+
+
      
+var gamble_luck_allowed = true
+
 
 var worker_efficiency_allowed = true
-var gamble_luck_allowed = true
+// Function that handles purchasing upgrades
 function upgrade(upgrade_element) {
+    // Converts upgrade name from the case used in HTML to snake case so the upgrade can be accessed in the upgrades dictionary
     let upgrade_name = upgrade_element.replaceAll("-", "_")
+    // Stores the number of times to upgrade
     let upgrade_number = 0
+    // Checks if player can afford upgrade
     if(game_data.money >= game_data.upgrades[upgrade_name].price) {
+        // Prevents purchasing worker efficiency if worker speed is at 0.5s (cap)
         if(upgrade_name == "worker_efficiency" && worker_efficiency_allowed == false) {
             alert("Worker speed is capped at 0.5s!")
             return null
         }
+        // Prevents purchasing gamble luck if win chance is at 75% (cap)
         if(upgrade_name == "gamble_luck" && gamble_luck_allowed == false) {
             alert("Win chance is capped at 75%")
             return null
         }
+        // Prevents purchasing population multiplier boost if prestige multiplier has reached x50 (cap)
         if(upgrade_name == "population_multiplier_boost" && game_data.next_prestige_multiplier >= 50) {
             alert("Population multiplier is capped at x50!")
             return null
         }
-        console.log(upgrade_name)
+    
         if(game_data.multi_purchase_state == 0) {
+            // For MAX multi-purchase setting, upgrade level is increased by to the max purchase value
+            // This is the value that stores the number of times the upgrade can be purchased with the money the player has
             game_data.upgrades[upgrade_name].level += game_data.upgrades[upgrade_name].max_purchase   
-            upgrade_number = game_data.upgrades[upgrade_name].max_purchase
+            upgrade_number = game_data.upgrades[upgrade_name].max_purchase 
         } else {  
+            // For the x1, x10 and x25 settings, upgrade level is increased by multi_purchase_state which is the number of times the ugprade will be purchased
             game_data.upgrades[upgrade_name].level += game_data.multi_purchase_state
             upgrade_number = game_data.multi_purchase_state
         }
 
+        // Applies upgrade effects depending on type of upgrade
+        // Upgrade number controls how many times they are upgraded
         for(let i = 0; i<upgrade_number; i++) {
             if(upgrade_name == "industry_boom") {   
-                game_data.money_per_second *= 1.2
+                game_data.money_per_second *= 1.2 // 20% increase to money per second
                 game_data.money_per_second = Math.round(game_data.money_per_second * 100) /100 //Removes extra, unwanted decimal places 
                 document.getElementById("money-per-second").textContent = formatNum(game_data.money_per_second)
             } else if (upgrade_name =="worker_efficiency" && game_data.worker_speed > 0.5) {
-                game_data.worker_speed -= 0.1
-                game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
-                game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100
+                game_data.worker_speed -= 0.1 // Reduces worker generation time by 0.12
+                game_data.total_worker_gen = (game_data.workers * game_data.worker_increase)  // Recalculates worker generation
+                game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100 //Removes extra, unwanted decimal places
                 document.getElementById("worker-gen").textContent = Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100
             } else if (upgrade_name == "worker_training") {
-                game_data.worker_increase *= (1 + (game_data.upgrades.worker_training.level * 20) / 100)
-                game_data.total_worker_gen = (game_data.workers * game_data.worker_increase) 
-                game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100
+                game_data.worker_increase *= (1 + (game_data.upgrades.worker_training.level * 20) / 100) // 20% increase to worker generation
+                game_data.total_worker_gen = (game_data.workers * game_data.worker_increase)  // Recalculates worker generation
+                game_data.total_worker_gen = Math.round(game_data.total_worker_gen * 100) /100 //Removes extra, unwanted decimal places
                 document.getElementById("worker-gen").textContent = formatNum(Math.round((game_data.total_worker_gen / game_data.worker_speed)* 100) /100)
             } else if(upgrade_name == "quicker_prestige") {
-                game_data.prestige_cost *= 0.95
+                game_data.prestige_cost *= 0.95 // Reduces pretige cost by 5%
                 document.getElementById("prestige-cost").textContent = formatNum(game_data.prestige_cost)
-            } else if (upgrade_name == "gamble_luck" && (game_data.win_chance + 0.05 <= 0.75)) {
-                game_data.win_chance += 0.05
+            }  else if (upgrade_name == "gamble_luck" && (game_data.win_chance + 0.05 <= 0.75)) {
+                game_data.win_chance += 0.05 // Increases win chance by 5%
                 game_data.win_chance = Math.round(game_data.win_chance * 100) / 100
                 document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
             } else if (upgrade_name == "achievement_gem_boost") {
-                console.log(game_data.achievements.clicks.gems)
-                game_data.achievements.clicks.gems = Math.ceil(game_data.achievements.clicks.gems * 1.02)
-                console.log(game_data.achievements.clicks.gems)
-                game_data.achievements.money.gems = Math.ceil(game_data.achievements.money.gems * 1.02)
-                game_data.achievements.gamble.gems = Math.ceil(game_data.achievements.gamble.gems * 1.02)
+                // 20% boost to achievement gem rewards
+                game_data.achievements.clicks.gems = Math.ceil(game_data.achievements.clicks.gems * 1.2)
+                game_data.achievements.money.gems = Math.ceil(game_data.achievements.money.gems * 1.2)
+                game_data.achievements.gamble.gems = Math.ceil(game_data.achievements.gamble.gems * 1.2)
             } else if(upgrade_name == "achievement_xp_boost") {
+                // 10% boost to achievement xp rewards
                 game_data.achievements.clicks.xp *= 1.1
                 game_data.achievements.money.xp *= 1.1
                 game_data.achievements.gamble.xp *= 1.1
             }
-        }
 
+        // Caps worker speed at 0.5s, prevents further upgrades once reached
         if(game_data.worker_speed <= 0.5) {
             worker_efficiency_allowed = false
         }
-        
+
+        // Caps win chance at 75%, prevents further upgrades once reached
         if(game_data.win_chance + 0.05 > 0.75) {
             gamble_luck_allowed = false
         }
 
-
+        // Takes upgrade price of money
         game_data.money -= game_data.upgrades[upgrade_name].price
         document.getElementById("money").textContent = formatNum(game_data.money)
+        // Scales upgrade price and increases price multiplier for next upgrade
         game_data.upgrades[upgrade_name].price *= 1 + game_data.upgrades[upgrade_name].price_multiplier
         game_data.upgrades[upgrade_name].price_multiplier += game_data.upgrades[upgrade_name].multiplier_increase 
         game_data.upgrades[upgrade_name].price = Math.round(game_data.upgrades[upgrade_name].price * 100) / 100 //Removes extra, unwanted decimal places 
 
-       
+        // Brings base price of upgrade up to current price
         game_data.upgrades[upgrade_name].base_price = game_data.upgrades[upgrade_name].price
-        game_data.upgrades[upgrade_name].base_multiplier = game_data.upgrades[upgrade_name].price_multiplier
         update_prices()
         
+        }
     }
 }
 
@@ -467,23 +488,27 @@ setInterval(() => {
 }, 1000)
 
 
-
+// Updates multi_purchase_state to its next value each time player clicks the button
 document.getElementById("multi-purchase-button").addEventListener("click", function (event) {
 
+    // Checks current state and switches to the one after
     switch(game_data.multi_purchase_state) {
         case 1: game_data.multi_purchase_state = 10; break
         case 10: game_data.multi_purchase_state = 25; break
         case 25: game_data.multi_purchase_state = 0; break
-        default: game_data.multi_purchase_state = 1
+        default: game_data.multi_purchase_state = 1 // If at the max state, reset back to x1
     }
-
+    
+    // If multi-purchase state is at MAX setting, update button text to "MAX"
     if (game_data.multi_purchase_state == 0) {
          document.getElementById("multi-purchase-state").textContent = "MAX"
     }
+    // Otherwise, set it to the multi_purchase_state value
     else {
         document.getElementById("multi-purchase-state").textContent = `x${game_data.multi_purchase_state}`
     }
 
+    // Updates prices according to multi_purchase_state
     update_prices()
     
 })
@@ -496,7 +521,7 @@ function update_prices() {
         let current_upgrade = game_data.upgrades[key]
         // Resets upgrade price and price multiplier to base values
         current_upgrade.price = current_upgrade.base_price
-        current_upgrade.price_multiplier = 0.1
+        current_upgrade.price_multiplier = current_upgrade.base_multiplier
         var prices = []
         prices.push(current_upgrade.price)
         var count = 1
@@ -507,7 +532,6 @@ function update_prices() {
             while(true) {
                 // Calculates the next price of the upgrade, by multiplying previous price by current price multiplier
                 next_price = prices[count -1] * (1 + current_upgrade.price_multiplier)
-                
                 
                 prices_sum = 0
                 // Calculates the sum of the upgrade prices array
@@ -562,6 +586,7 @@ function update_prices() {
             upgrade_number ++
         }
 
+        current_upgrade.price = Math.round(current_upgrade.price * 100) / 100
         // Updates upgrade price and level displays
         update_price_and_level()
     }
@@ -604,19 +629,24 @@ function update_game_displays() {
     
 }
 
+// Function that formats large numbers by abbreviating them with a letter. E.g. 1000000 => 1M
 function formatNum(num) {
+    // Doesn't format numbers below 1000
     if (num < 1000) {
         return num
     }
-    const unitAbbreviations = ["K", "M", "B", "T", "Q", "Qi", "Sx", "Oc", "No", "Dc"]
+    // Unit abbreviations from 1000 (1 thousand or "1K") to 1000000000000000000000000000000000 (1 Decillion)
+    const unit_abbreviations = ["K", "M", "B", "T", "Q", "Qi", "Sx", "Oc", "No", "Dc"]
     let index = 0
     
-    while (num >= 1000 && index < unitAbbreviations.length) {
+    // Repeatedly divides num by 1000 until it is less than 1000 or bigger than 1Dc, incrementing index by 1 each time 
+    while (num >= 1000 && index < unit_abbreviations.length) {
         num /= 1000
         index ++
     }
-    return parseFloat(num.toFixed(2)) + unitAbbreviations[index-1]
 
+    // Returns num followed by the appropriate abbreviation 
+    return parseFloat(num.toFixed(2)) + unit_abbreviations[index-1]
 }
 
 // Function that handles prestige
@@ -667,6 +697,12 @@ function prestige() {
     game_data.sounds.win = new Audio("win.mp3"),
     game_data.sounds.lose = new Audio("lose.mp3")
 
+    game_data.effects.double_click_power.button = document.getElementById("click-effect-button")
+    game_data.effects.double_click_power.title = document.getElementById("click-effect-title")
+    game_data.effects.double_money.button = document.getElementById("money-effect-button")
+    game_data.effects.double_money.title = document.getElementById("money-effect-title")
+    game_data.effects.double_worker_gen.button = document.getElementById("worker-effect-button")
+    game_data.effects.double_worker_gen.title = document.getElementById("worker-effect-title")
     // Removes previous save from local storage
     localStorage.removeItem("game_data")
 }
