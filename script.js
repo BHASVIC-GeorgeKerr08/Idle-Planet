@@ -4,7 +4,7 @@
 
 const game_data = {
     // POPULATION AND MONEY
-    population: 1000000,
+    population: 0,
     money: 0,
     money_per_second: 0, 
 
@@ -22,7 +22,7 @@ const game_data = {
 
     upgrade_elements : [
         'click-surge', 'income-boost', 'industry-boom',
-        'worker-training', 'worker-efficiency',
+        'worker-training', 'worker-efficiency', 
         'population-multiplier-boost', 'quicker-prestige',
         'double-minigame-reward', 'temporary-population-surge', 
         'gamble-luck','win-streak',
@@ -197,12 +197,12 @@ const game_data = {
 
     // LEVEL SYSTEM
 
-    gems: 50,
+    gems: 0,
     xp: 0,
 
     level: 1,
     level_goal: 1000,
-    level_gem_reward: 10,
+    level_gem_reward: 50,
     level_population_reward: 100000,
 
     // EFFECTS
@@ -237,12 +237,6 @@ const game_data = {
 // Creates default copy of data, used to reset game data after prestige
 const default_game_data = JSON.parse(JSON.stringify(game_data))
 
-// ========== FUNCTIONS ========== //
-
-
-
-
-// ========== EVENT LISTENERS ========== //
 
 // Click event listener for planet button
 // Event handler code updates population and money_per_seoncd, and updates the population and money per second display in the HTML
@@ -288,7 +282,6 @@ document.getElementById("worker-button").addEventListener("click", function (eve
  
 })
 
-// ========== LOOPS ========== //
 
 // Infinite loop that increases money by money per second
 setInterval(() => {
@@ -338,8 +331,6 @@ for(let i = 0; i < game_data.upgrade_elements.length; i++) {
 
      
 var gamble_luck_allowed = true
-
-
 var worker_efficiency_allowed = true
 // Function that handles purchasing upgrades
 function upgrade(upgrade_element) {
@@ -410,8 +401,8 @@ function upgrade(upgrade_element) {
                 game_data.achievements.clicks.xp *= 1.1
                 game_data.achievements.money.xp *= 1.1
                 game_data.achievements.gamble.xp *= 1.1
-            }
-
+            }      
+        }
         // Caps worker speed at 0.5s, prevents further upgrades once reached
         if(game_data.worker_speed <= 0.5) {
             worker_efficiency_allowed = false
@@ -432,9 +423,9 @@ function upgrade(upgrade_element) {
 
         // Brings base price of upgrade up to current price
         game_data.upgrades[upgrade_name].base_price = game_data.upgrades[upgrade_name].price
+        game_data.upgrades[upgrade_name].base_multiplier = game_data.upgrades[upgrade_name].price_multiplier
         update_prices()
-        
-        }
+
     }
 }
 
@@ -515,7 +506,7 @@ document.getElementById("multi-purchase-button").addEventListener("click", funct
 
 // Function that updates prices when multi-purchase button is clicked
 function update_prices() { 
-    
+    let upgrade_number = 0
     // Iterates over shop upgrade objects in game_data
     for(const key in game_data.upgrades) {
         let current_upgrade = game_data.upgrades[key]
@@ -594,7 +585,7 @@ function update_prices() {
 
      
 function save_data() {
-    //localStorage.setItem("game_data", JSON.stringify(game_data))
+    localStorage.setItem("game_data", JSON.stringify(game_data))
 }
 
 setInterval(() => {
@@ -608,6 +599,17 @@ document.getElementById("save-button").addEventListener("click", function (event
 
 window.onload = function() {
     Object.assign(game_data, (JSON.parse(localStorage.getItem("game_data"))))
+    game_data.achievements.clicks.element = document.getElementById("achievement-clicks")
+    game_data.achievements.money.element = document.getElementById("achievement-money")
+    game_data.achievements.gamble.element = document.getElementById("achievement-gambles")
+    game_data.sounds.win = new Audio("win.mp3"),
+    game_data.sounds.lose = new Audio("lose.mp3")
+    game_data.effects.double_click_power.button = document.getElementById("click-effect-button")
+    game_data.effects.double_click_power.title = document.getElementById("click-effect-title")
+    game_data.effects.double_money.button = document.getElementById("money-effect-button")
+    game_data.effects.double_money.title = document.getElementById("money-effect-title")
+    game_data.effects.double_worker_gen.button = document.getElementById("worker-effect-button")
+    game_data.effects.double_worker_gen.title = document.getElementById("worker-effect-title")
     update_game_displays()
 
 }
@@ -626,6 +628,26 @@ function update_game_displays() {
     document.getElementById("win").hidden = true
     document.getElementById("loss").hidden = true
     document.getElementById("win-chance").textContent = `${Math.round((game_data.win_chance * 100) * 100) / 100}%`
+    document.getElementById("gems").textContent = game_data.gems
+    game_data.achievements.clicks.element.querySelector("div").style.width = `${(game_data.achievements.clicks.progress / game_data.achievements.clicks.goal) * 100}%` 
+    game_data.achievements.clicks.element.querySelector("span").textContent =
+    `
+    \u00A0 - ${formatNum(Math.round(game_data.achievements.clicks.progress * 100) / 100)}/${formatNum(Math.round(game_data.achievements.clicks.goal * 100) / 100)}
+    ` 
+    game_data.achievements.money.element.querySelector("div").style.width = `${(game_data.achievements.money.progress / game_data.achievements.money.goal) * 100}%` 
+    game_data.achievements.money.element.querySelector("span").textContent = 
+    `
+    \u00A0 - ${formatNum(Math.round(game_data.achievements.money.progress * 100) / 100)}/${formatNum(Math.round(game_data.achievements.money.goal * 100) / 100)}
+    ` 
+    game_data.achievements.gamble.element.querySelector("div").style.width = `${(game_data.achievements.gamble.progress / game_data.achievements.gamble.goal) * 100}%` 
+    game_data.achievements.gamble.element.querySelector("span").textContent = 
+    `
+    \u00A0 - ${formatNum(Math.round(game_data.achievements.gamble.progress * 100) / 100)}/${formatNum(Math.round(game_data.achievements.gamble.goal * 100) / 100)}
+    ` 
+    document.getElementById("xp").textContent = formatNum(Math.round(game_data.xp * 100) / 100)
+    document.getElementById("level").textContent = game_data.level
+    document.getElementById("level-goal").textContent = formatNum(game_data.level_goal)
+    document.getElementById("level-progress-bar").style.width = `${(game_data.xp / game_data.level_goal) * 100}%`
     
 }
 
@@ -721,6 +743,10 @@ document.getElementById("prestige-button").addEventListener("click", function (e
 setInterval(() => {
     // Increases prestige mulitplier by 0.1 per 100k population, plus the boost form the population multiplier upgrade (+0.5 per upgrade)
     game_data.next_prestige_multiplier = (1 + 0.1 * (game_data.population / 100000) + (0.5 * game_data.upgrades.population_multiplier_boost.level)).toFixed(1)
+    // Caps multiplier at 50
+    if(game_data.next_prestige_multiplier > 50) [
+        game_data.next_prestige_multiplier = 50
+    ]
     //Updates population multiplier display in HTML
     document.getElementById("population-multiplier").textContent = game_data.next_prestige_multiplier
     
@@ -810,6 +836,7 @@ function gamble() {
             // Plays win sound
             game_data.sounds.win.play()
             game_data.win_streak ++
+            update_achievement("gamble", 1) // Increases gamble achievement completion each consecutive win
             
         } else {
             game_data.population -= game_data.bet
@@ -818,6 +845,7 @@ function gamble() {
             // Plays loss sound
             game_data.sounds.lose.play()  
             game_data.win_streak = 0
+            update_achievement("reset_gamble_achievement") // Resets gamble achievement after win streak loss
             
         }
 
@@ -871,6 +899,9 @@ function update_achievement(type, amount) {
                 complete_achievement(type) // Completes achievement
             } else {
                 // If achievement is not complete, update progress bar to percentage value of completion
+                if(type == gamble) {
+                    console.log(achievement.progress)
+                }
                 achievement.element.querySelector("div").style.width = `${(achievement.progress / achievement.goal) * 100}%` 
                 // And update achievement progress display, ensures there is whitespace and dash between achievement title and progress display
                 achievement.element.querySelector("span").textContent = 
@@ -891,6 +922,7 @@ function complete_achievement(type) {
     increase_level()
 
     if(type == "gamble") {
+        console.log(achievement.gems)
         // Increases gamble achievement goal by 1
         achievement.goal ++
     } else {
@@ -921,9 +953,6 @@ function complete_achievement(type) {
         achievement.element.querySelector("div").style.width = `${(achievement.progress / achievement.goal) * 100}%`
     }
 
-    
-
-    
     // Updates achievement title with updated achievement goal
     game_data.achievements.clicks.element.querySelector("h3").textContent = `Click planet ${formatNum(game_data.achievements.clicks.goal)} times`
     game_data.achievements.money.element.querySelector("h3").textContent = `Earn ${formatNum(game_data.achievements.money.goal)} money`
@@ -984,6 +1013,7 @@ function purchase_effect(effect_name) {
     game_data.gems -= game_data.effects[effect_name].cost
     document.getElementById("gems").textContent = formatNum(Math.round(game_data.gems * 100) / 100)
 
+    // Activates effect
     game_data.effects[effect_name].active = true
     console.log(effect_name + " activated")
 
@@ -993,16 +1023,19 @@ function purchase_effect(effect_name) {
     const flash_interval = setInterval(() => {
         if(flash) {
             game_data.effects[effect_name].title.style.backgroundColor = "limegreen"
+            flash = false
         } else {
             game_data.effects[effect_name].title.style.backgroundColor = "#3D2A4F"
+            flash = true
         }
-        flash = !flash
+        
     }, 500);
 
     setTimeout(() => {
        clearInterval(flash_interval) // Stops effect flashing
        game_data.effects[effect_name].title.style.backgroundColor = "#3D2A4F"
-       game_data.effects[effect_name].active = false
+       // Deactivates effect after time has passed
+       game_data.effects[effect_name].active = false 
        console.log(effect_name + " deactivated")
     }, game_data.effects[effect_name].time * 1000)
 }
