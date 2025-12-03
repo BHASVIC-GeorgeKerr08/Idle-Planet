@@ -303,6 +303,7 @@ body {
     margin: 10px;
     text-align: center;
     background-color: #1C1B29;
+    
 }
 
 
@@ -550,6 +551,7 @@ body {
 }
 
 
+
 .achievement {
     border: 2px solid white;
     border-radius: 10px;
@@ -578,5 +580,35 @@ body {
 
 .achievement span {
     z-index: 1;
+}
+
+
+button {
+  transition: transform 0.1s ease-out; 
+}
+
+button:active { 
+  transform: translateY(5px);
+}
+
+
+.planet-button {
+  transition: transform 0.3s ease-out; 
+}
+
+.planet-button:active { 
+  transform: translateY(20px);
+}
+
+.planet-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.planet-button:hover {
+    background: none;
+    border-radius: 120px;
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 10px 20px rgba(145, 92, 182, .4);
+    transition: 0.3s ease-in-out;
 }
 
